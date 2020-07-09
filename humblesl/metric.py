@@ -9,20 +9,20 @@ FLAGS = flags.FLAGS
 
 
 @jax.jit
-def accuracy(logits, batch):
+def accuracy(logits, targets):
     """Returns classification accuracy."""
     # Return accuracy = how many predictions match the ground truth
-    return jnp.mean(jnp.argmax(logits, axis=-1) == batch['label'])
+    return jnp.mean(jnp.argmax(logits, axis=-1) == targets)
 
 
 @jax.jit
-def softmax_cross_entropy_with_logits(logits, batch, num_classes=None):
+def softmax_cross_entropy_with_logits(logits, targets, num_classes=None):
     """Computes mean softmax cross entropy with logits over the batch."""
     if num_classes is None:
         num_classes = FLAGS.num_classes
 
     # Generate one_hot labels from index classes
-    labels = jax.nn.one_hot(batch['label'], num_classes)
+    labels = jax.nn.one_hot(targets, num_classes)
 
     softmax_xent = -jnp.sum(labels * jax.nn.log_softmax(logits))
     softmax_xent /= labels.shape[0]

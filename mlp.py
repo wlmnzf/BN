@@ -56,7 +56,8 @@ def main(argv):
         # Get network predictions
         logits = net.apply(params, batch)
         # Compute mean softmax cross entropy over the batch
-        softmax_xent = hsl.softmax_cross_entropy_with_logits(logits, batch)
+        softmax_xent = hsl.softmax_cross_entropy_with_logits(logits,
+                                                             batch['label'])
         # Compute the weight decay loss by penalising the norm of parameters
         l2_loss = hsl.l2_loss(params)
         return softmax_xent + FLAGS.weight_decay * l2_loss
@@ -77,7 +78,7 @@ def main(argv):
         """Calculates accuracy."""
         logits = net.apply(params, batch)
         return {
-            'accuracy': hsl.accuracy(logits, batch),
+            'accuracy': hsl.accuracy(logits, batch['label']),
             'loss': loss(params, batch),
         }
 
