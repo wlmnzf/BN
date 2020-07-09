@@ -11,27 +11,38 @@ FLAGS = flags.FLAGS
 def mlp_fn(batch,
            hidden_sizes=[300, 100],
            hidden_activation=jax.nn.relu,
-           output_size=None,
+           output_sizes=None,
            output_activation=None):
     """Standard MLP network."""
 
-    if output_size is None:
-        output_size = FLAGS.num_classes
+    if output_sizes is None:
+        output_sizes = [FLAGS.num_classes]
 
     # Normalize input data.
     x = batch['image'].astype(jnp.float32) / 255.
 
-    # Build body.
-    layers = [hk.Flatten()]
-    for size in hidden_sizes:
-        layers += [hk.Linear(size), hidden_activation]
+    class MLP(hk.Module):
+        def __call__(self, x):
+            # Build body.
+            h = hk.Flatten()(x)
+            for size in hidden_sizes:
+                z = hk.Linear(size)(h)
+                h = hidden_activation(z)
 
-    # Build head.
-    layers.append(hk.Linear(output_size))
-    if output_activation is not None:
-        layers.append(output_activation)
+            # Build head(s).
+            heads = []
+            for size in output_sizes:
+                head = hk.Linear(size)(h)
+                if output_activation is not None:
+                    head = output_activation(head)
+                heads.append(head)
 
-    mlp = hk.Sequential(layers)
+            if len(heads) == 1:
+                return heads[0]
+            else:
+                return heads
+
+    mlp = MLP()
     return mlp(x)
 
 
