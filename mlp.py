@@ -7,10 +7,7 @@ from absl import app
 from absl import flags
 from absl import logging
 
-from utils import data as data_utils
-from utils import metric as metric_utils
-from utils import network as network_utils
-from utils import train as train_utils
+import humblesl as hsl
 
 FLAGS = flags.FLAGS
 FLAGS.showprefixforinfo = False
@@ -26,12 +23,12 @@ def main(argv):
     del argv
 
     # Make datasets for train and test.
-    train_dataset = data_utils.load_dataset(
-        'train', is_training=True, batch_size=1000)
-    train_eval_dataset = data_utils.load_dataset(
-        'train', is_training=False, batch_size=10000)
-    test_eval_dataset = data_utils.load_dataset(
-        'test', is_training=False, batch_size=10000)
+    train_dataset = hsl.load_dataset(
+        'mnist:3.*.*', 'train', is_training=True, batch_size=1000)
+    train_eval_dataset = hsl.load_dataset(
+        'mnist:3.*.*', 'train', is_training=False, batch_size=10000)
+    test_eval_dataset = hsl.load_dataset(
+        'mnist:3.*.*', 'test', is_training=False, batch_size=10000)
 
     # Draw a data batch and log shapes.
     batch = next(train_dataset)
@@ -42,14 +39,13 @@ def main(argv):
     # batch norm, we use `hk.transform`. When we use batch_norm, we will use
     # `hk.transform_with_state`.
     net = hk.without_apply_rng(hk.transform(
-        network_utils.mlp_fn,
+        hsl.mlp_fn,
         apply_rng=True
     ))
 
     # Initialize model
     params = net.init(jax.random.PRNGKey(42), batch)
-    logging.info('Total number of parameters: %d',
-                 network_utils.get_num_params(params))
+    logging.info('Total number of parameters: %d', hsl.get_num_params(params))
 
     # Define and initialize optimizer.
     opt = optix.adam(FLAGS.lr)
@@ -60,10 +56,10 @@ def main(argv):
         # Get network predictions
         logits = net.apply(params, batch)
         # Compute mean softmax cross entropy over the batch
-        softmax_xent = metric_utils.softmax_cross_entropy_with_logits(
+        softmax_xent = hsl.softmax_cross_entropy_with_logits(
             logits, batch)
         # Compute the weight decay loss by penalising the norm of parameters
-        l2_loss = metric_utils.l2_loss(params)
+        l2_loss = hsl.l2_loss(params)
         return softmax_xent + FLAGS.weight_decay * l2_loss
 
     @jax.jit
@@ -82,20 +78,20 @@ def main(argv):
         """Calculates accuracy."""
         logits = net.apply(params, batch)
         return {
-            'accuracy': metric_utils.accuracy(logits, batch),
+            'accuracy': hsl.accuracy(logits, batch),
             'loss': loss(params, batch),
         }
 
     # Train!
-    train_utils.loop(params,
-                     opt_state,
-                     calculate_metrics,
-                     sgd_update,
-                     train_dataset,
-                     train_eval_dataset,
-                     test_eval_dataset,
-                     n_steps=FLAGS.n_train_steps,
-                     log_interval=FLAGS.log_interval)
+    hsl.loop(params=params,
+             opt_state=opt_state,
+             train_dataset=train_dataset,
+             sgd_update=sgd_update,
+             n_steps=FLAGS.n_train_steps,
+             log_interval=FLAGS.log_interval,
+             train_eval_dataset=train_eval_dataset,
+             test_eval_dataset=test_eval_dataset,
+             calculate_metrics=calculate_metrics)
 
 
 if __name__ == '__main__':
