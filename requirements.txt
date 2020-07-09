@@ -1,0 +1,6 @@
+absl-py
+dm-haiku
+jax
+jaxlib
+tensorflow
+tensorflow_datasets
