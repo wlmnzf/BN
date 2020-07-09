@@ -19,7 +19,7 @@ def mlp_fn(batch,
         output_sizes = [FLAGS.num_classes]
 
     # Normalize input data.
-    x = batch['image'].astype(jnp.float32) / 255.
+    x = batch.astype(jnp.float32) / 255.
 
     class MLP(hk.Module):
         def __call__(self, x):

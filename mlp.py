@@ -44,7 +44,7 @@ def main(argv):
     ))
 
     # Initialize model
-    params = net.init(jax.random.PRNGKey(42), batch)
+    params = net.init(jax.random.PRNGKey(42), batch['image'])
     logging.info('Total number of parameters: %d', hsl.get_num_params(params))
 
     # Define and initialize optimizer.
@@ -54,7 +54,7 @@ def main(argv):
     def loss(params, batch):
         """Compute the loss of the network, including L2 for regularization."""
         # Get network predictions
-        logits = net.apply(params, batch)
+        logits = net.apply(params, batch['image'])
         # Compute mean softmax cross entropy over the batch
         softmax_xent = hsl.softmax_cross_entropy_with_logits(logits,
                                                              batch['label'])
@@ -76,7 +76,7 @@ def main(argv):
 
     def calculate_metrics(params, batch):
         """Calculates accuracy."""
-        logits = net.apply(params, batch)
+        logits = net.apply(params, batch['image'])
         return {
             'accuracy': hsl.accuracy(logits, batch['label']),
             'loss': loss(params, batch),
