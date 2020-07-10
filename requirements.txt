@@ -2,5 +2,6 @@ absl-py
 dm-haiku
 jax
 jaxlib
+matplotlib
 tensorflow
 tensorflow_datasets
