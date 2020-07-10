@@ -16,6 +16,16 @@ def accuracy(logits, targets):
 
 
 @jax.jit
+def binary_cross_entropy_with_logits(logits, targets):
+    """Computes mean binary cross entropy with logits over the batch."""
+    log_pi = jax.nn.log_sigmoid(logits)
+    binary_xent = targets * log_pi + (1 - targets) * (log_pi - logits)
+    binary_xent = jnp.sum(binary_xent) / targets.shape[0]
+
+    return binary_xent
+
+
+@jax.jit
 def softmax_cross_entropy_with_logits(logits, targets, num_classes=None):
     """Computes mean softmax cross entropy with logits over the batch."""
     if num_classes is None:
@@ -28,6 +38,21 @@ def softmax_cross_entropy_with_logits(logits, targets, num_classes=None):
     softmax_xent /= labels.shape[0]
 
     return softmax_xent
+
+
+@jax.jit
+def kl_divergence(mu, logvar):
+    """Computes mean KL between parameterized Gaussian and Normal distributions.
+
+    Gaussian parameterized by mu and logvar. Mean over the batch.
+
+    NOTE: See Appendix B from VAE paper (Kingma 2014):
+          https://arxiv.org/abs/1312.6114
+    """
+    kl_divergence = jnp.sum((jnp.exp(logvar) + mu**2 - 1 - logvar)) / 2
+    kl_divergence /= mu.shape[0]
+
+    return kl_divergence
 
 
 @jax.jit
