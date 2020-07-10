@@ -19,9 +19,6 @@ def mlp_fn(batch,
     if output_sizes is None:
         output_sizes = [FLAGS.num_classes]
 
-    # Normalize input data.
-    x = batch.astype(jnp.float32) / 255.
-
     class MLP(hk.Module):
         def __call__(self, x):
             # Build body.
@@ -44,7 +41,7 @@ def mlp_fn(batch,
                 return heads
 
     mlp = MLP(name=name)
-    return mlp(x)
+    return mlp(batch)
 
 
 def get_num_params(params):

@@ -31,9 +31,9 @@ def main(argv):
         'mnist:3.*.*', 'test', is_training=False, batch_size=10000)
 
     # Draw a data batch and log shapes.
-    batch = next(train_dataset)
-    logging.info("Image batch shape: %s", batch['image'].shape)
-    logging.info("Label batch shape: %s", batch['label'].shape)
+    batch_image, batch_label = next(train_dataset)
+    logging.info("Image batch shape: %s", batch_image.shape)
+    logging.info("Label batch shape: %s", batch_label.shape)
 
     # Since we don't store additional state statistics, e.g. needed in
     # batch norm, we use `hk.transform`. When we use batch_norm, we will use
@@ -44,7 +44,7 @@ def main(argv):
     ))
 
     # Initialize model
-    params = net.init(jax.random.PRNGKey(42), batch['image'])
+    params = net.init(jax.random.PRNGKey(42), batch_image)
     logging.info('Total number of parameters: %d', hsl.get_num_params(params))
 
     # Define and initialize optimizer.
@@ -53,11 +53,12 @@ def main(argv):
 
     def loss(params, batch):
         """Compute the loss of the network, including L2 for regularization."""
+        batch_image, batch_label = batch
         # Get network predictions
-        logits = net.apply(params, batch['image'])
+        logits = net.apply(params, batch_image)
         # Compute mean softmax cross entropy over the batch
         softmax_xent = hsl.softmax_cross_entropy_with_logits(logits,
-                                                             batch['label'])
+                                                             batch_label)
         # Compute the weight decay loss by penalising the norm of parameters
         l2_loss = hsl.l2_loss(params)
         return softmax_xent + FLAGS.weight_decay * l2_loss
@@ -76,9 +77,10 @@ def main(argv):
 
     def calculate_metrics(params, batch):
         """Calculates accuracy."""
-        logits = net.apply(params, batch['image'])
+        batch_image, batch_label = batch
+        logits = net.apply(params, batch_image)
         return {
-            'accuracy': hsl.accuracy(logits, batch['label']),
+            'accuracy': hsl.accuracy(logits, batch_label),
             'loss': loss(params, batch),
         }
 
