@@ -92,7 +92,7 @@ def main(argv):
     opt = optix.adam(FLAGS.lr)
     opt_state = opt.init(params)
 
-    def sample_z(mu, logvar, rng):
+    def sample_latent(mu, logvar, rng):
         """Sample latent variable from Gaussian.
 
         NOTE: It uses reparameterization trick.
@@ -106,7 +106,7 @@ def main(argv):
         encoder_params, decoder_params = get_encoder_decoder_params(params)
 
         mu, logvar = encoder.apply(encoder_params, batch_image)
-        z = sample_z(mu, logvar, rng)
+        z = sample_latent(mu, logvar, rng)
         x = decoder.apply(decoder_params, z)
 
         binary_xent = hsl.binary_cross_entropy_with_logits(
