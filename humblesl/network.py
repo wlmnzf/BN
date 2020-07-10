@@ -12,7 +12,8 @@ def mlp_fn(batch,
            hidden_sizes=[300, 100],
            hidden_activation=jax.nn.relu,
            output_sizes=None,
-           output_activation=None):
+           output_activation=None,
+           name=None):
     """Standard MLP network."""
 
     if output_sizes is None:
@@ -42,7 +43,7 @@ def mlp_fn(batch,
             else:
                 return heads
 
-    mlp = MLP()
+    mlp = MLP(name=name)
     return mlp(x)
 
 
