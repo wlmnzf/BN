@@ -23,6 +23,7 @@ FLAGS.showprefixforinfo = False
 
 flags.DEFINE_float('lr', 1e-3, 'Learning rate.')
 flags.DEFINE_integer('latent_size', 20, 'Latent space size.')
+flags.DEFINE_integer('batch_size', 128, 'Latent space size.')
 flags.DEFINE_integer('n_train_steps', 5000, 'Number of training steps.')
 flags.DEFINE_integer('log_interval', 1000, 'Training logging interval.')
 flags.DEFINE_string('ckpt_path', './out/vae_params.pkl', 'Checkpoint path.')
@@ -52,7 +53,7 @@ def main(argv):
 
     # Make datasets for train and test.
     train_dataset = hsl.load_dataset(
-        'mnist:3.*.*', 'train', is_training=True, batch_size=1000)
+        'mnist:3.*.*', 'train', is_training=True, batch_size=FLAGS.batch_size)
     test_eval_dataset = hsl.load_dataset(
         'mnist:3.*.*', 'test', is_training=False, batch_size=10000)
     batch_image, _ = next(train_dataset)
