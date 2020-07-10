@@ -11,6 +11,7 @@ def loop(params,
          opt_state,
          train_dataset,
          sgd_update,
+         rng=None,
          n_steps=None,
          log_interval=None,
          train_eval_dataset=None,
@@ -43,7 +44,12 @@ def loop(params,
             break
 
         # Do SGD on a batch of training examples.
-        params, opt_state = sgd_update(params, opt_state, next(train_dataset))
+        sgd_kwargs = dict(params=params,
+                          opt_state=opt_state,
+                          batch=next(train_dataset))
+        if rng is not None:
+            sgd_kwargs['rng'] = next(rng)
+        params, opt_state = sgd_update(**sgd_kwargs)
 
         step += 1
 
