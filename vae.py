@@ -22,9 +22,9 @@ FLAGS = flags.FLAGS
 FLAGS.showprefixforinfo = False
 
 flags.DEFINE_float('lr', 1e-3, 'Learning rate.')
-flags.DEFINE_integer('latent_size', 20, 'Latent space size.')
-flags.DEFINE_integer('batch_size', 128, 'Latent space size.')
-flags.DEFINE_integer('n_train_steps', 5000, 'Number of training steps.')
+flags.DEFINE_integer('latent_size', 10, 'Latent space size.')
+flags.DEFINE_integer('batch_size', 64, 'Latent space size.')
+flags.DEFINE_integer('n_train_steps', 100000, 'Number of training steps.')
 flags.DEFINE_integer('log_interval', 1000, 'Training logging interval.')
 flags.DEFINE_string('ckpt_path', './out/vae_params.pkl', 'Checkpoint path.')
 flags.DEFINE_integer('ckpt_interval', 1000, 'Params checkpoint interval.')
@@ -62,13 +62,13 @@ def main(argv):
 
     encoder = hk.transform(functools.partial(
         hsl.mlp_fn,
-        hidden_sizes=[400],
+        hidden_sizes=[512, 512],
         output_sizes=[FLAGS.latent_size] * 2,
         name='encoder'
     ))
     decoder = hk.transform(functools.partial(
         hsl.mlp_fn,
-        hidden_sizes=[400],
+        hidden_sizes=[512, 512],
         output_sizes=[h * w],
         name='decoder'
     ))
