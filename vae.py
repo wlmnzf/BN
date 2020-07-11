@@ -30,19 +30,20 @@ flags.DEFINE_string('ckpt_path', './out/vae_params.pkl', 'Checkpoint path.')
 flags.DEFINE_integer('ckpt_interval', 1000, 'Params checkpoint interval.')
 
 
-def plot_samples(samples, grid_shape):
+def plot_samples(logits, grid_shape):
     plt.close()
+    images = jax.nn.sigmoid(logits)
 
     plt.figure(figsize=grid_shape)
     gs = gridspec.GridSpec(*grid_shape)
     gs.update(wspace=0.05, hspace=0.05)
-    for i, sample in enumerate(samples):
+    for i, image in enumerate(images):
         ax = plt.subplot(gs[i])
         plt.axis('off')
         ax.set_xticklabels([])
         ax.set_yticklabels([])
         ax.set_aspect('equal')
-        plt.imshow(sample, cmap='Greys_r')
+        plt.imshow(image, cmap='Greys_r')
 
     plt.draw()
     plt.pause(0.001)
@@ -132,8 +133,8 @@ def main(argv):
         _, decoder_params = params
 
         z = jax.random.normal(next(rng), shape=(16, FLAGS.latent_size))
-        x = decoder.apply(decoder_params, z)
-        plot_samples(x.reshape(16, h, w), grid_shape=(4, 4))
+        logits = decoder.apply(decoder_params, z)
+        plot_samples(logits.reshape(16, h, w), grid_shape=(4, 4))
 
         elbo_, binary_xent, kl_divergence = elbo(params, batch, next(rng))
         mean_approx_evidence = jnp.exp(elbo_ / (h * w))
