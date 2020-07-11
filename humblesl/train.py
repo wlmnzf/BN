@@ -11,7 +11,7 @@ def loop(params,
          opt_state,
          train_dataset,
          sgd_update,
-         rng=None,
+         prng_sequence=None,
          n_steps=None,
          log_interval=None,
          train_eval_dataset=None,
@@ -47,8 +47,8 @@ def loop(params,
         sgd_kwargs = dict(params=params,
                           opt_state=opt_state,
                           batch=next(train_dataset))
-        if rng is not None:
-            sgd_kwargs['rng'] = next(rng)
+        if prng_sequence is not None:
+            sgd_kwargs['rng'] = next(prng_sequence)
         params, opt_state = sgd_update(**sgd_kwargs)
 
         step += 1

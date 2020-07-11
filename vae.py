@@ -149,7 +149,7 @@ def main(argv):
              opt_state=opt_state,
              train_dataset=train_dataset,
              sgd_update=sgd_update,
-             rng=rng,
+             prng_sequence=rng,
              n_steps=FLAGS.n_train_steps,
              log_interval=FLAGS.log_interval,
              test_eval_dataset=test_eval_dataset,
