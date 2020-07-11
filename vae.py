@@ -76,17 +76,13 @@ def main(argv):
     rng = hk.PRNGSequence(42)
     encoder_params = encoder.init(next(rng), batch_image)
     decoder_params = decoder.init(next(rng), jnp.zeros([n, FLAGS.latent_size]))
-    params = hk_data.merge(encoder_params, decoder_params)
+    params = (encoder_params, decoder_params)
     logging.info('Total number of encoder parameters: %d',
                  hsl.get_num_params(encoder_params))
     logging.info('Total number of decoder parameters: %d',
                  hsl.get_num_params(decoder_params))
     logging.info('Total number of parameters: %d',
                  hsl.get_num_params(params))
-
-    def get_encoder_decoder_params(params):
-        return hk_data.partition(
-            lambda module_name, name, value: 'encoder' in module_name, params)
 
     # Define and initialize optimizer.
     opt = optix.adam(FLAGS.lr)
@@ -103,7 +99,7 @@ def main(argv):
     def elbo(params, batch, rng):
         """Computes the Evidence Lower Bound."""
         batch_image, _ = batch
-        encoder_params, decoder_params = get_encoder_decoder_params(params)
+        encoder_params, decoder_params = params
 
         mu, logvar = encoder.apply(encoder_params, batch_image)
         z = sample_latent(mu, logvar, rng)
@@ -133,7 +129,7 @@ def main(argv):
 
     def calculate_metrics(params, batch):
         """Calculates accuracy."""
-        _, decoder_params = get_encoder_decoder_params(params)
+        _, decoder_params = params
 
         z = jax.random.normal(next(rng), shape=(16, FLAGS.latent_size))
         x = decoder.apply(decoder_params, z)
