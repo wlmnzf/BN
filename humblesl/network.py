@@ -9,7 +9,7 @@ FLAGS = flags.FLAGS
 
 
 def mlp_fn(batch,
-           hidden_sizes=[300, 100],
+           hidden_sizes=[64, 64],
            hidden_activation=jax.nn.relu,
            output_sizes=None,
            output_activation=None,
