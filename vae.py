@@ -111,7 +111,7 @@ def main(argv):
 
         binary_xent = hsl.binary_cross_entropy_with_logits(
             x, jnp.reshape(batch_image, (batch_image.shape[0], -1)))
-        kl_divergence = hsl.kl_divergence(mu, logvar)
+        kl_divergence = hsl.gaussian_kl(mu, logvar)
         elbo_ = binary_xent - kl_divergence
         return elbo_, binary_xent, kl_divergence
 

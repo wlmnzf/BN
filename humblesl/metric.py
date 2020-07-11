@@ -41,7 +41,7 @@ def softmax_cross_entropy_with_logits(logits, targets, num_classes=None):
 
 
 @jax.jit
-def kl_divergence(mu, logvar):
+def gaussian_kl(mu, logvar):
     """Computes mean KL between parameterized Gaussian and Normal distributions.
 
     Gaussian parameterized by mu and logvar. Mean over the batch.
@@ -49,7 +49,7 @@ def kl_divergence(mu, logvar):
     NOTE: See Appendix B from VAE paper (Kingma 2014):
           https://arxiv.org/abs/1312.6114
     """
-    kl_divergence = jnp.sum((jnp.exp(logvar) + mu**2 - 1 - logvar)) / 2
+    kl_divergence = jnp.sum(jnp.exp(logvar) + mu**2 - 1 - logvar) / 2
     kl_divergence /= mu.shape[0]
 
     return kl_divergence

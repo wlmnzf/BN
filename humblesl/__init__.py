@@ -12,7 +12,7 @@ from .data import load_dataset
 from .metric import accuracy
 from .metric import binary_cross_entropy_with_logits
 from .metric import softmax_cross_entropy_with_logits
-from .metric import kl_divergence
+from .metric import gaussian_kl
 from .metric import l2_loss
 from .metric import log_metrics
 
