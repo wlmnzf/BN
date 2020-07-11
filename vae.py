@@ -14,7 +14,6 @@ from absl import app
 from absl import flags
 from absl import logging
 from jax.experimental import optix
-from haiku import data_structures as hk_data
 
 import humblesl as hsl
 
@@ -30,9 +29,8 @@ flags.DEFINE_string('ckpt_path', './out/vae_params.pkl', 'Checkpoint path.')
 flags.DEFINE_integer('ckpt_interval', 1000, 'Params checkpoint interval.')
 
 
-def plot_samples(logits, grid_shape):
+def plot_samples(images, grid_shape):
     plt.close()
-    images = jax.nn.sigmoid(logits)
 
     plt.figure(figsize=grid_shape)
     gs = gridspec.GridSpec(*grid_shape)
@@ -132,9 +130,10 @@ def main(argv):
         """Calculates accuracy."""
         _, decoder_params = params
 
-        z = jax.random.normal(next(rng), shape=(16, FLAGS.latent_size))
-        logits = decoder.apply(decoder_params, z)
-        plot_samples(logits.reshape(16, h, w), grid_shape=(4, 4))
+        latent = jax.random.normal(next(rng), shape=(16, FLAGS.latent_size))
+        logits = decoder.apply(decoder_params, latent)
+        images = jax.nn.sigmoid(logits)
+        plot_samples(images.reshape(16, h, w), grid_shape=(4, 4))
 
         elbo_, binary_xent, kl_divergence = elbo(params, batch, next(rng))
         mean_approx_evidence = jnp.exp(elbo_ / (h * w))
