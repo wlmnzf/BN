@@ -21,6 +21,7 @@ FLAGS = flags.FLAGS
 FLAGS.showprefixforinfo = False
 
 flags.DEFINE_float('lr', 1e-3, 'Learning rate.')
+flags.DEFINE_float('beta', 1.0, 'ELBO kl divergence weight.')
 flags.DEFINE_integer('latent_size', 10, 'Latent space size.')
 flags.DEFINE_integer('batch_size', 64, 'Latent space size.')
 flags.DEFINE_integer('n_train_steps', 100000, 'Number of training steps.')
@@ -107,7 +108,7 @@ def main(argv):
         binary_xent = hsl.binary_cross_entropy_with_logits(
             x, jnp.reshape(batch_image, (batch_image.shape[0], -1)))
         kl_divergence = hsl.gaussian_kl(mu, logvar)
-        elbo_ = binary_xent - kl_divergence
+        elbo_ = binary_xent - FLAGS.beta * kl_divergence
         return elbo_, binary_xent, kl_divergence
 
     def loss(params, batch, rng):
