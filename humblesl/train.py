@@ -32,6 +32,7 @@ def loop(params,
                 metrics['test'] = calculate_metrics(
                     params, next(test_eval_dataset))
 
+            print('')  # One line space.
             metrics = jax.device_get(metrics)
             for prefix, metric in metrics.items():
                 metric_utils.log_metrics(prefix, step, metric)
