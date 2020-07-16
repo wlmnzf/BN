@@ -22,7 +22,7 @@ flags.DEFINE_float('lr', 1e-3, 'Learning rate.')
 flags.DEFINE_integer('batch_size', 64, 'Latent space size.')
 flags.DEFINE_integer('num_classes', 10, 'Number of classes.')
 flags.DEFINE_integer('n_train_steps', 100000, 'Number of training steps.')
-flags.DEFINE_float('beta', 1.0, 'ELBO kl divergence weight.')
+flags.DEFINE_float('beta', 0.001, 'ELBO kl divergence weight.')
 flags.DEFINE_integer('num_samples', 10, 'Nb. of params samples in inference.')
 flags.DEFINE_integer('log_interval', 1000, 'Training logging interval.')
 flags.DEFINE_string('ckpt_path', './out/bayes_params.pkl', 'Checkpoint path.')
@@ -84,7 +84,8 @@ def main(argv):
     params = net.init(next(rng), batch_image)
     prior = dict(
         mu=jax.tree_map(jnp.zeros_like, params),  # Init to zero mean.
-        logvar=jax.tree_map(jnp.zeros_like, params),  # Init to unit variance.
+        logvar=jax.tree_map(lambda x: -7 * jnp.ones_like(x),
+                            params),  # Init to ~0.001 variance.
     )
     logging.info('Total number of parameters: %d', hsl.get_num_params(prior))
 
