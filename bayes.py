@@ -1,7 +1,4 @@
-"""Simple Bernoulli VAE generative model on MNIST.
-
-See: http://ruishu.io/2018/03/19/bernoulli-vae/.
-"""
+"""Simple Variational Bayes NN classifier on MNIST."""
 
 import functools
 
