@@ -83,8 +83,9 @@ def main(argv):
     rng = hk.PRNGSequence(42)
     params = net.init(next(rng), batch_image)
     prior = dict(
-        mu=jax.tree_map(jnp.zeros_like, params),
-        logvar=jax.tree_map(lambda x: 2 * hsl.kaiming_logvar(x.shape), params),
+        mu=jax.tree_map(jnp.zeros_like, params),  # Init to zero mean.
+        logvar=jax.tree_map(lambda x: -7 * jnp.ones_like(x),
+                            params),  # Init to ~0.001 variance.
     )
     logging.info('Total number of parameters: %d', hsl.get_num_params(prior))
 

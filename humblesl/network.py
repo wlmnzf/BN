@@ -50,13 +50,3 @@ def get_num_params(params):
     for p in jax.tree_leaves(params):
         num_params = num_params + jnp.prod(p.shape)
     return num_params
-
-
-def kaiming_logvar(shape):
-    """Kaiming initialization log variance for a layer with `shape`."""
-    if len(shape) == 1:
-        # For biases.
-        return jnp.zeros(shape)
-    else:
-        # For weights.
-        return jnp.ones(shape) * jnp.log(2 / shape[0])

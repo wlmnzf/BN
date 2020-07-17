@@ -18,6 +18,5 @@ from .metric import log_metrics
 
 from .network import mlp_fn
 from .network import get_num_params
-from .network import kaiming_logvar
 
 from .train import loop
