@@ -2,7 +2,7 @@
 
 ## What you get:
 
-1. mlp.py - MLP clssifier on MNIST (in JAX and Haiku).
+1. mlp.py - MLP classifier on MNIST (in JAX and Haiku).
 2. vae.py - Bernoulli VAE generative model on MNIST.
    See: [USING A BERNOULLI VAE ON REAL-VALUED OBSERVATIONS](http://ruishu.io/2018/03/19/bernoulli-vae/).
 3. bayes.py - Variational Bayes NN classifier on MNIST.
