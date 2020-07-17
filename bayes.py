@@ -83,9 +83,10 @@ def main(argv):
     rng = hk.PRNGSequence(42)
     params = net.init(next(rng), batch_image)
     prior = dict(
-        mu=jax.tree_map(jnp.zeros_like, params),  # Init to zero mean.
-        logvar=jax.tree_map(lambda x: -7 * jnp.ones_like(x),
-                            params),  # Init to ~0.001 variance.
+        # Haiku inits weights to trun. normal, with stddev ``1 / sqrt(fan_in)``.
+        mu=params,
+        # Init to ~0.001 variance around default Haiku initialization.
+        logvar=jax.tree_map(lambda x: -7 * jnp.ones_like(x), params),
     )
     logging.info('Total number of parameters: %d', hsl.get_num_params(prior))
 
