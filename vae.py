@@ -23,7 +23,7 @@ FLAGS.showprefixforinfo = False
 flags.DEFINE_float('lr', 1e-3, 'Learning rate.')
 flags.DEFINE_float('beta', 1.0, 'ELBO kl divergence weight.')
 flags.DEFINE_integer('latent_size', 10, 'Latent space size.')
-flags.DEFINE_integer('batch_size', 64, 'Latent space size.')
+flags.DEFINE_integer('batch_size', 64, 'Training batch size.')
 flags.DEFINE_integer('n_train_steps', 100000, 'Number of training steps.')
 flags.DEFINE_integer('log_interval', 1000, 'Training logging interval.')
 flags.DEFINE_string('ckpt_path', './out/vae_params.pkl', 'Checkpoint path.')

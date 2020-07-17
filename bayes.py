@@ -16,7 +16,7 @@ FLAGS = flags.FLAGS
 FLAGS.showprefixforinfo = False
 
 flags.DEFINE_float('lr', 1e-3, 'Learning rate.')
-flags.DEFINE_integer('batch_size', 64, 'Latent space size.')
+flags.DEFINE_integer('batch_size', 128, 'Training batch size.')
 flags.DEFINE_integer('num_classes', 10, 'Number of classes.')
 flags.DEFINE_integer('n_train_steps', 100000, 'Number of training steps.')
 flags.DEFINE_float('beta', 0.001, 'ELBO kl divergence weight.')
@@ -56,7 +56,7 @@ def main(argv):
 
     # Make datasets for train and test.
     train_dataset = hsl.load_dataset(
-        'mnist:3.*.*', 'train', is_training=True, batch_size=1000)
+        'mnist:3.*.*', 'train', is_training=True, batch_size=FLAGS.batch_size)
     train_eval_dataset = hsl.load_dataset(
         'mnist:3.*.*', 'train', is_training=False, batch_size=10000)
     test_eval_dataset = hsl.load_dataset(
@@ -127,14 +127,14 @@ def main(argv):
         posterior = optix.apply_updates(params, updates)
         return posterior, opt_state
 
-    def calculate_metrics(params, batch):
+    def calculate_metrics(params, data):
         """Calculates metrics."""
-        batch_image, batch_label = batch
-        probs = predict(net, params, batch_image, next(rng), FLAGS.num_samples)
-        elbo_, log_likelihood, kl_divergence = elbo(params, batch, next(rng))
+        images, labels = data
+        probs = predict(net, params, images, next(rng), FLAGS.num_samples)
+        elbo_, log_likelihood, kl_divergence = elbo(params, data, next(rng))
         mean_aprx_evidence = jnp.exp(elbo_ / FLAGS.num_classes)
         return {
-            'accuracy': hsl.accuracy(probs, batch_label),
+            'accuracy': hsl.accuracy(probs, labels),
             'elbo': elbo_,
             'log_likelihood': log_likelihood,
             'kl_divergence': kl_divergence,
