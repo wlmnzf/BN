@@ -1,7 +1,5 @@
 """Simple Variational Bayes NN classifier on MNIST."""
 
-import functools
-
 import haiku as hk
 import jax
 import jax.numpy as jnp
