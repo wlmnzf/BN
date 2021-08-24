@@ -59,7 +59,6 @@ def main(argv):
         'mnist:3.*.*', 'train', is_training=False, batch_size=10000)
     test_eval_dataset = hsl.load_dataset(
         'mnist:3.*.*', 'test', is_training=False, batch_size=10000)
-    batch_image, _ = next(train_dataset)
 
     # Draw a data batch and log shapes.
     batch_image, batch_label = next(train_dataset)
@@ -71,7 +70,7 @@ def main(argv):
     # `hk.transform_with_state`.
     net = hk.without_apply_rng(hk.transform(
         hsl.mlp_fn,
-        apply_rng=True
+        apply_rng=True  # In the process of being removed. Can only be `True`.
     ))
 
     # Initialize model
@@ -79,6 +78,7 @@ def main(argv):
     params = net.init(next(rng), batch_image)
     prior = dict(
         # Haiku inits weights to trun. normal, with stddev ``1 / sqrt(fan_in)``.
+        # Where ``fan_in`` is the number of incoming connection to the layer.
         mu=params,
         # Init to ~0.001 variance around default Haiku initialization.
         logvar=jax.tree_map(lambda x: -7 * jnp.ones_like(x), params),
