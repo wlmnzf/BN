@@ -39,14 +39,14 @@ def sample_params(prior, rng):
 
 
 def predict(net, prior, batch_image, rng, num_samples):
-    probs = jnp.zeros((batch_image.shape[0], FLAGS.num_classes))
-    for _ in range(num_samples):
+    probs = []
+    for i in range(num_samples):
         params_rng, rng = jax.random.split(rng)
         params = sample_params(prior, params_rng)
         logits = net.apply(params, batch_image)
-        probs += jax.nn.softmax(logits)
-    probs /= num_samples
-    return probs
+        probs.append(jax.nn.softmax(logits))
+    stack_probs = jnp.stack(probs)
+    return jnp.mean(stack_probs, axis=0), jnp.std(stack_probs, axis=0)
 
 
 def main(argv):
@@ -128,7 +128,7 @@ def main(argv):
     def calculate_metrics(params, data):
         """Calculates metrics."""
         images, labels = data
-        probs = predict(net, params, images, next(rng), FLAGS.num_samples)
+        probs = predict(net, params, images, next(rng), FLAGS.num_samples)[0]
         elbo_, log_likelihood, kl_divergence = elbo(params, data, next(rng))
         mean_aprx_evidence = jnp.exp(elbo_ / FLAGS.num_classes)
         return {
